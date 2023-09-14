@@ -1,0 +1,191 @@
+---
+title: "Lista 1 MLG"
+author: "Davi Wentrick Feijó - 200016806"
+date: "2023-09-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+```
+
+
+#### 2) Para um modelo de regressao simples $Y_i = \beta_0 + \beta_1 X_i + \epsilon_i$ , com $E(\epsilon_i) = 0$ e $i = 1,···,n$ encontre:
+
+##### a) $E(Y_i|X_i)$
+
+$$
+E(Y_i|X_i) = E(\beta_0 + \beta_1 X_i + \epsilon_i)
+$$
+$$
+E(Y_i|X_i) = \beta_0 + \beta_1 X_i + E(\epsilon_i)
+$$
+$$
+E(Y_i|X_i) = \beta_0 + \beta_1 X_i 
+$$
+
+##### b) $Var(Y_i|X_i)$
+
+$$
+Var(Y_i|X_i) = Var(\beta_0 + \beta_1 X_i + \epsilon_i)
+$$
+$$
+Var(Y_i|X_i) = Var(\beta_0) + Var(\beta_1 X_i) + Var(\epsilon_i)
+$$
+Variancia de uma constante é 0 logo:
+
+$$
+Var(Y_i|X_i) = Var(\epsilon_i)
+$$
+
+##### c) $Cov(Y_i,Y_j)$
+
+Sabemos que:
+
+$$
+\begin{align}
+E(Y_i) &= E(\beta_0 + \beta_1 X_i + \epsilon_i) = \beta_0 + \beta_1 X_i \\
+Var(Y_i) &= Var(\beta_0 + \beta_1 X_i + \epsilon_i) = \sigma^2 \\
+\end{align}
+$$
+
+$$
+\begin{align}
+Cov(Y_i,Y_j) &= E(Y_i Y_j) - E(Y_i)E(Y_j) \\
+Cov(Y_i,Y_j) &= E[(\beta_0 + \beta_1 X_i + \epsilon_i) (\beta_0 + \beta_1 X_j + \epsilon_j)] - (\beta_0 + \beta_1 X_i)(\beta_0 + \beta_1 X_j) \\
+Cov(Y_i,Y_j) &= E(\beta_0 + \beta_1 X_i + \epsilon_i) E(\beta_0 + \beta_1 X_j + \epsilon_j)] - (\beta_0 + \beta_1 X_i)(\beta_0 + \beta_1 X_j) \\
+Cov(Y_i,Y_j) &= (\beta_0 + \beta_1 X_i)(\beta_0 + \beta_1 X_j) - (\beta_0 + \beta_1 X_i)(\beta_0 + \beta_1 X_j) = 0 
+\end{align}
+$$
+
+
+##### d) $Cov(\bar Y,\hat \beta_1)$
+
+$$
+\begin{align}
+Cov(\bar Y,\hat \beta_1) &= E(\bar Y \beta_1) - E(\bar Y)E(\beta_1) \\
+Cov(\bar Y,\hat \beta_1) &= \bar Y \beta_1 - \bar Y\beta_1 = 0 \\
+\end{align}
+$$
+Sabmeos que a esperança de uma constante é ela mesma
+
+##### e) $Cov(\bar Y,\hat \beta_0)$
+
+$$
+\begin{align}
+Cov(\bar Y,\hat \beta_0) &= E(\bar Y \beta_0) - E(\bar Y)E(\beta_0) \\
+Cov(\bar Y,\hat \beta_0) &= \bar Y \beta_0 - \bar Y\beta_1 = 0 \\
+\end{align}
+$$
+
+
+#### 3) Determine se as seguintes afirmativas sao verdadeiras e porque
+
+
+
+##### a) Quando pedido para escrever um modelo linear simples (MLS), um estudante escreveu $E(Y_i|X_i) = \beta_0 + \beta_1 X_i + \epsilon_i$ .Voce concorda?
+
+
+##### b) Em um MLS, $Y_i = \beta_0 + \beta_1 X_i + \epsilon_i$, temos que $\beta_0$ e $\beta_1$ sao os unicos parametros desconhecidos.
+
+
+
+#### 5) Considere o modelo de regressao linear simples $Y_i = \beta_0 + \beta_1 X_i + \epsilon_i$, com $E(\epsilon_i) = 0$ e $i = 1,...,n$. Assuma $\epsilon_i = Y_i − \hat Y$  um estimador de $\epsilon_i$, e $d_i = \frac{1}{n} − K_i \bar X$, com $Ki = \frac{X_i − \bar X}{S_{xx}}$. Mostre que:
+
+##### a) $\sum_{i=1}^{n}Y_i = \sum_{i=1}^{n}\hat Y_i$ 
+
+$$
+\begin{align}
+\sum_{i=1}^{n} Y_i &= \sum_{i=1}^{n} \hat Y_i \\
+\sum_{i=1}^{n} Y_i &= \sum_{i=1}^{n} (\beta_0 + \beta_1 X_i) \\
+\sum_{i=1}^{n} Y_i &= n \beta_0 + \beta_1 \sum_{i=1}^{n} X_i \\
+n \bar Y &= n\beta_0 + n \beta_1 \bar X \\
+n \bar Y &= n(\beta_0 + \beta_1 \bar X) \\
+\bar Y &= \beta_0 + \beta_1 \bar X
+\end{align}
+$$
+
+##### b) $\sum_{i=1}^{n}X_i e_i = 0$
+
+
+
+$$
+\begin{align}
+&\sum_{i=1}^{n}X_i e_i = 0 \\
+&\sum_{i=1}^{n}X_i (Y_i-\hat Y_i) = 0 \\
+&\sum_{i=1}^{n}X_i (Y_i-\beta_0 - \beta_1 X_i) = 0 \\
+&\sum_{i=1}^{n}X_i (Y_i-(\bar Y - \beta_1 \bar X) - \beta_1 X_i) = 0 \\
+&\sum_{i=1}^{n}X_i (Y_i-\bar Y + \beta_1 \bar X - \beta_1 X_i) = 0 \\
+&\sum_{i=1}^{n} (Y_iX_i-\bar Y X_i + \beta_1 \bar X X_i - \beta_1 X_i X_i) = 0 \\
+&\sum_{i=1}^{n} (Y_iX_i-\bar Y X_i + \beta_1 (\bar X X_i - X_i^2)) = 0 \\
+&\sum_{i=1}^{n} Y_iX_i-\bar Y \sum_{i=1}^{n}X_i - \beta_1 (\sum_{i=1}^{n}X_i^2 - n \bar X^2 ) = 0 \\
+&\sum_{i=1}^{n} Y_iX_i-n \bar Y \bar X  - (\frac{\sum_{i=1}^{n}X_iY_i - n \bar X \bar Y}{\sum_{i=1}^{n}X_i^2 - n \bar X^2}) (\sum_{i=1}^{n}X_i^2 - n \bar X^2 ) = 0 \\
+&\sum_{i=1}^{n} Y_iX_i-n \bar Y \bar X  - (\sum_{i=1}^{n}X_iY_i - n \bar X \bar Y) = 0 \\
+\end{align}
+$$
+
+
+
+
+
+
+
+
+##### c) $\sum_{i=1}^{n} \hat Y_i e_i = 0$
+
+$$
+\sum_{i=1}^{n} \hat Y_i e_i = 0 \\
+\sum_{i=1}^{n} [e_i (\beta_0 + \beta_1 X_i)]  = 0 \\
+\sum_{i=1}^{n} (e_i\beta_0 + e_i\beta_1 X_i)  = 0 \\
+\beta_0 \sum_{i=1}^{n} e_i + \beta_1\sum_{i=1}^{n}e_i X_i  = 0 \\
+$$
+
+Sabemos que $\sum_{i=1}^{n} e_i = 0$ e pelo resultado anterior $\sum_{i=1}^{n}e_i X_i = 0$ 
+
+
+##### d) $\sum_{i=1}^{n} d_i = 1$
+
+$$
+\sum_{i=1}^{n} d_i = 1 \\
+\sum_{i=1}^{n} (\frac{1}{n} - \frac{(X_i - \bar X) \bar X}{S_{xx}}) = 1 \\
+\frac{n}{n} - \sum_{i=1}^{n} (\frac{(X_i - \bar X) \bar X}{S_{xx}}) = 1 \\
+1 - \sum_{i=1}^{n} (\frac{(X_i\bar X - \bar X^2) }{S_{xx}}) = 1 \\
+1 -  (\frac{\bar X \sum_{i=1}^{n} (X_i - \bar X) }{S_{xx}}) = 1 \\
+$$
+
+Sabemos que $\sum_{i=1}^{n} (X_i - \bar X) = 0 $ logo o resultado é igual a 1
+
+
+##### e) $\sum_{i=1}^{n} X_i d_i = 0$
+
+
+
+$$
+\sum_{i=1}^{n} X_i d_i = 0 \\
+\sum_{i=1}^{n} X_i (\frac{1}{n} - \frac{(X_i - \bar X) \bar X}{S_{xx}}) = 0 \\
+\sum_{i=1}^{n}  [\frac{X_i}{n} - X_i(\frac{(X_i - \bar X) \bar X}{S_{xx}})] = 0 \\
+\sum_{i=1}^{n}  [\frac{X_i}{n} - \frac{(X_i - \bar X) \bar X X_i}{S_{xx}}] = 0 \\
+\sum_{i=1}^{n}  [\frac{X_i}{n} - \frac{(X_i \bar X X_i - \bar X \bar X X_i) }{S_{xx}}] = 0 \\
+\sum_{i=1}^{n}  [\frac{X_i}{n} - \frac{(X_i^2 \bar X  - \bar X^2 X_i) }{S_{xx}}] = 0 \\
+\sum_{i=1}^{n}  [\frac{X_i}{n} - \bar X \frac{(X_i^2 - \bar X X_i) }{S_{xx}}] = 0 \\
+\bar X - \bar X \sum_{i=1}^{n} \frac{(X_i^2 - \frac{\sum_{i=1}^{n} X_i}{n} X_i) }{S_{xx}}] = 0 \\
+\bar X - \bar X \frac{(\sum_{i=1}^{n}X_i^2 - \frac{\sum_{i=1}^{n} X_i^2}{n})}{S_{xx}}] = 0 \\
+$$
+
+
+Sabemos que $S_{xx} = \sum_{i=1}^{n}X_i^2 - \frac{\sum_{i=1}^{n} X_i^2}{n}$ ou seja a fração resulta em 1 sobrando apenas $\bar X - \bar X = 0$
+
+
+#### 6) Considere o modelo de regress˜ao linear simples $Y_i = \beta_0 + \beta_1 X_i + \epsilon_i$ , com $E(\epsilon_i) = 0$, $Var(\epsilon_i) = \sigma^2$ , e assuma que $\epsilon_i$ e nao correlacionado. Se denotarmos por SQT, SQReg e SQE as somas dos quadrados dos totais, da regressao e dos erros, respectivamente. Mostre que:
+
+##### a) $E(SQT) = \sigma^2(n-1) \beta_1^2 S_{xx}$
+
+##### b) $E(SQReg) = \sigma^2 \beta_1^2 S_{xx}$
+
+##### c) $E(SQReg) = (n-2) \sigma^2$
+
+##### d) $Cov(\hat \beta_0, \hat \beta_1) = \frac{\bar X \sigma^2}{S_{xx}}$
+
+
