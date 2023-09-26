@@ -182,6 +182,22 @@ Sabemos que $S_{xx} = \sum_{i=1}^{n}X_i^2 - \frac{\sum_{i=1}^{n} X_i^2}{n}$ ou s
 
 ##### a) $E(SQT) = \sigma^2(n-1) \beta_1^2 S_{xx}$
 
+Vale notar que:
+
+$$
+SQT = S_{yy} = \sum y^2_i-n\bar y^2
+$$
+Sabmeos que $y_i = \beta_0 + \beta_1 X_1 + \epsilon_i$
+
+$$
+E(SQT) = E[\sum Y^2_i-n\bar Y^2] = \sum E(Y^2_i) - n E(\bar Y^2) 
+$$
+
+
+$$
+E(SQT) = \sum_{i=1}^{n}(Var(Y_i)+E^2(Y_i))
+$$
+
 ##### b) $E(SQReg) = \sigma^2 \beta_1^2 S_{xx}$
 
 ##### c) $E(SQReg) = (n-2) \sigma^2$
