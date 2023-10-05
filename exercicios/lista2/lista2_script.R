@@ -1,4 +1,4 @@
-pacman::p_load(tidyverse,readr,Matrix,readxl,forcats,psych,ggcorrplot,GGally,olsrr,leaps,MASS,plyr)
+pacman::p_load(readr,Matrix,readxl,forcats,psych,ggcorrplot,GGally,olsrr,leaps,MASS,plyr,tidyverse)
 
 Q01_data <- read_table("exercicios/lista2/Q01_data.txt")
 Q02_data <- read_table("exercicios/lista2/Q02_data.txt", col_types = cols(X4 = col_skip()))
@@ -6,10 +6,10 @@ Q02_data <- read_table("exercicios/lista2/Q02_data.txt", col_types = cols(X4 = c
 Q01_data %>%
   mutate(x1 = as.factor(x1))
 
-modelo1_completo = lm(y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10, data = Q01_data)
+modelo1_completo = lm(y ~ x1 + x2 + x3 + x4 + x6 + x7 + x8 + x9 , data = Q01_data)
 anova(modelo1_completo)
 
-matriz_cor = cor(Q01_data)
+matriz_cor = cor(Q01_data %>% dplyr::select(-c(1,5,6,11)))
 
 # Converter a matriz de correlação em um data frame
 df_cor <- as.data.frame(matriz_cor)
@@ -22,7 +22,9 @@ ggcorrplot(df_cor,lab = TRUE)
 ggpairs(Q01_data)
 
 #####################################
+
 k <- ols_step_all_possible(modelo1_completo)
+subsets = as.data.frame(k)
 plot(k)
 
 k <- ols_step_forward_p(modelo1_completo)
@@ -35,7 +37,7 @@ k <- ols_step_both_p(modelo1_completo)
 plot(k)
 
 #####################################
-features <- Q01_data %>% select(-1)
+features <- Q01_data %>% dplyr::select(-c(1,5,6,11))
 reg <- regsubsets(features, Q01_data$y)
 reg.summary <- summary(reg)
 reg.summary
@@ -67,10 +69,6 @@ points(best.bic, reg.summary$bic[best.bic], col="red", cex=2,pch=20)
 best.cp_model <- which.min(reg.summary$cp)
 coef(reg, best.cp_model)
 
-
-library(MASS)
-base_mdl <- lm(mortalityRate~HC+NOx+SO2, data=pd_clean)
-full_mdl <- lm(mortalityRate~., data=pd_clean)
 
 # Note k=2 uses AIC.  You can use k=log(n) if you want BIC
 forward_mdl <- step(modelo1_completo,scope = modelo1_completo, direction="forward", k=2)

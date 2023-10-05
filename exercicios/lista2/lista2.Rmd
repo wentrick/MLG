@@ -7,20 +7,157 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+pacman::p_load(readr,Matrix,readxl,forcats,psych,ggcorrplot,GGally,olsrr,leaps,MASS,plyr,tidyverse,lmtest,knitr,kable)
+
+Q01_data <- read_table("Q01_data.txt")
+Q02_data <- read_table("Q02_data.txt", col_types = cols(X4 = col_skip()))
+
+Q01_data %>%
+  mutate(x1 = as.factor(x1))
 ```
 
-#### Q1. Considere os dados sobre a qualidade do vinho tinto, apresentados no ficheiro `Q01-data.txt`. Ajuste o modelo de regressao linear multipla, e faca uma analise completa desses dados. Que conclusoes voce tira dessa an´alise? (use 5% de significancia durantes as analises)
+#### Q1. Considere os dados sobre a qualidade do vinho tinto, apresentados no ficheiro `Q01-data.txt`. Ajuste o modelo de regressao linear multipla, e faca uma analise completa desses dados. Que conclusoes voce tira dessa analise? (use 5% de significancia durantes as analises)
+
+\
+
+Vamos fazer uma analise do modelo usando todo o banco para ver os resultados gerais.
+
+```{r echo=FALSE}
+modelo1_completo = lm(y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10 , data = Q01_data)
+summary(modelo1_completo)
+```
+
+\newpage
+```{r echo=FALSE}
+anova(modelo1_completo)
+```
+
+
+```{r echo=FALSE,out.width = "100%"}
+par(mfrow=c(2,2))
+plot(modelo1_completo)
+```
+
+
+```{r echo=FALSE}
+matriz_cor = cor(Q01_data)
+# Converter a matriz de correlação em um data frame
+df_cor <- as.data.frame(matriz_cor)
+
+# Criar o gráfico de correlação (corr plot)
+ggcorrplot(df_cor,lab = TRUE)
+
+```
+
+
 
 Com base no conjunto de dados, e possıvel observar que algumas covariaveis estao fortemente correlacionadas. Assim, pede-se:
 
+```{r}
+
+```
+
+
+
+
 ##### (a) Proponha algum metodo para resolver o problema da multicolinearidade no conjunto de dados.
+
+Podemos perceber que temos um problema incomum de algumas variaveis terem correlaçao perfeita, isso definitivamente atrapalha o modelo e dificuldat qualquer metodo de selecao de variaveis, especialemnte dentro do R. Logo é necessario removermos essas variaveis problematicas. Em seguida podemos rodar um modelo de selecao de variaveis. Nesse caso vamos retirar as variaves x4, x5 e x10 que possuem multiplas correlaçoes altas com outras variaveis
+
+```{r}
+modelo1_completo = lm(y ~ x1 + x2 + x3 + x4 + x6 + x7 + x8 + x9 , data = Q01_data)
+anova(modelo1_completo)
+
+matriz_cor = cor(Q01_data %>% dplyr::select(-c(1,5,6,11)))
+
+# Converter a matriz de correlação em um data frame
+df_cor <- as.data.frame(matriz_cor)
+
+# Criar o gráfico de correlação (corr plot)
+ggcorrplot(df_cor,lab = TRUE)
+
+```
+
 
 ##### (b) Usando algum metodo de selecao de variaveis, obtenha o modelo final para o conjunto de dados.
 
+```{r include=FALSE}
+forward_mdl <- step(modelo1_completo,scope = modelo1_completo, direction="forward", k=2)
+summary(forward_mdl)
+
+backward_mdl <- step(modelo1_completo,scope = modelo1_completo, direction="backward", k=2)
+summary(backward_mdl)
+
+
+both_mdl <- step(modelo1_completo,scope = modelo1_completo, direction="both", k=2)
+summary(both_mdl)
+```
+
+
+```{r echo=FALSE}
+l<-list(data.frame(t(data.frame(coef(forward_mdl)))),
+        data.frame(t(data.frame(coef(backward_mdl)))),
+        data.frame(t(data.frame(coef(both_mdl)))))
+stepwise_results <- do.call(rbind.fill, l)
+row.names(stepwise_results) <- c('Forward','Backward','Both')
+stepwise_results
+```
+
+POdemos ver que o metodo backward e both deram os mesmos resultados, contudo se escolhermos o modelo com base no R^2 ajustado veremos que o modelo do forward tem um resultado um pouco menor, logo vamos com utilizar o modelo encontrado pelos outros metodos. 
+
+```{r}
+summary(both_mdl)
+```
+
+
 ##### (c) Apresente a tabela da Analise de Variancia para testar a significancia global dos coeficientes do modelo final. Apresente as hip´otese de teste, e conclua.
+```{r}
+anova(both_mdl)
+resultado_anova = aov(both_mdl)
+```
+
+```{r echo=FALSE}
+SSTotal <- var(Q01_data$y) * (nrow(Q01_data)-1)
+    SSE     <- sum( both_mdl$resid^2 )
+SSreg   <- SSTotal - SSE
+
+dfE   <- both_mdl$df.residual
+dfReg <- nrow(Q01_data) - 1 - dfE
+MSreg <- SSreg / dfReg
+MSE   <- SSE / dfE
+Fstat <- MSreg / MSE
+pval  <- pf( Fstat , dfReg, dfE , lower.tail=FALSE )
+```
+
+```{r echo=FALSE}
+tabela_anova <- data.frame(
+  Fonte = c("Regressao", "Erro", "Total"),
+  Soma_de_Quadrados = c(SSreg, SSE, SSTotal),
+  Graus_de_Liberdade = c(dfReg, dfE, nrow(Q01_data) - 1),
+  Quadrados_Médios = c(MSreg, MSE, NA),
+  F_Statistic = c(Fstat, NA, NA),
+  P_Value = c(pval, NA, NA)
+)
+
+kable(tabela_anova,col.names = c("Fonte","SSQ","GL","QM","F","P") ,format = "latex")
+```
+O resultado indica que é signigficante e que todos os coeficientes sao diferentes de 0.
+
 
 ##### (d) Com base no modelo obtido no item anterior, faca uma analise de resıduos e conclua.
 
+```{r echo=FALSE}
+par(mfrow=c(2,2))
+plot(both_mdl)
+residuo = both_mdl$residuals
+```
+
+```{r}
+shapiro.test(residuo)
+bptest(both_mdl)
+```
+Podemos perceber que o modelo passa nos testes de normalidade e variancida dos residuos.
 
 #### Q02. Uma equipe de pesquisadores de saude mental deseja comparar tres metodos de tratamento da depressao grave (A, B e C=referencia). Eles tambem gostariam de estudar a relacao entre idade e eficacia do tratamento, bem como a interacao (se houver) entre idade e tratamento. Cada elemento da amostra aleatoria simples de 36 pacientes, foi selecionado aleatoriamente para receber o tratamento A, B ou C. Os dados obtidos podem ser encontrados no ficheiro `Q02-data.txt`. A variavel dependente y e a eficacia do tratamento; as variaveis independentes sao: a idade do paciente no aniversario mais proximo, e o tipo de tratamento administrado (use 1% de significancia durantes as analises).
 
