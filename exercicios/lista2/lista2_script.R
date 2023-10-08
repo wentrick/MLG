@@ -1,4 +1,4 @@
-pacman::p_load(readr,Matrix,readxl,forcats,psych,ggcorrplot,GGally,olsrr,leaps,MASS,plyr,tidyverse)
+pacman::p_load(readr,Matrix,readxl,forcats,psych,ggcorrplot,GGally,olsrr,leaps,MASS,plyr,tidyverse,fastDummies)
 
 Q01_data <- read_table("exercicios/lista2/Q01_data.txt")
 Q02_data <- read_table("exercicios/lista2/Q02_data.txt", col_types = cols(X4 = col_skip()))
@@ -107,6 +107,22 @@ summary(modelo_forward)
 summary(modelo_backward)
 summary(modelo_stepwise)
 
+###############################################################################
 
 
+Q02_data <- read_table("exercicios/lista2/Q02_data.txt", col_types = cols(X4 = col_skip()))
+
+Q02_data = Q02_data %>%
+  mutate(tratamento = as.factor(tratamento))
+
+modelo1_completo = lm(eficacia ~ idade + tratamento, data = Q02_data)
+summary(modelo1_completo)
+anova(modelo1_completo)
+
+Q02_data_dummies = Q02_data %>%
+  dummy_cols(select_columns = "tratamento", remove_selected_columns = TRUE, remove_first_dummy  = TRUE)
+
+modelo1_completo = lm(eficacia ~ idade + tratamento_B + tratamento_C + idade:tratamento_B + idade:tratamento_C,  data = Q02_data_dummies)
+summary(modelo1_completo)
+anova(modelo1_completo)
 
