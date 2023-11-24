@@ -1,0 +1,159 @@
+---
+title: "Estudo GLM Residuos"
+author: "Davi Wentrick Feijó"
+date: "2023-11-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Analise de residuos
+
+Vamos realizar uma analise de residuos de um GLM aplicado nesse banco de dados usando a funcao Gamma e link log ou seja uma regressao gama com link log
+
+```{r}
+Chperfom<-read.table("ChemicalPerform.txt", header=T)
+```
+
+```{r}
+head(Chperfom)
+```
+
+#### Analise descritiva
+
+Vamos realizar uma analise descritiva da variavel resposta do nosso modelo
+
+```{r}
+hist(Chperfom$y, ylab = "Frequências", xlab = "Variável resposta")
+str(Chperfom)
+summary(Chperfom)
+```
+
+#### Ajustando o Modelo
+
+Agora vamos para a parte de ajuste do modelo da nossa regressao gama usando a funcao `glm()`
+
+```{r}
+fit.gamma<-glm(y~., data = Chperfom, family = Gamma(link="log"))
+summary(fit.gamma)
+```
+
+Vamos obter os intervalos de confianca
+
+```{r}
+confint(fit.gamma)
+```
+
+
+#### Analise de residuos
+
+1.Residuo de Person (Soma de quadrados)
+
+$$
+r^p_i = \frac{y_i-\hat\mu_i}{\sqrt{Var(\hat Y_i)}}
+$$
+
+```{r}
+G=sum(residuals(fit.gamma,type="pearson")^2)
+
+pchisq(G,df.residual(fit.gamma),lower.tail = F)
+
+pchisq(deviance(fit.gamma), df.residual(fit.gamma), lower.tail=FALSE)
+```
+2.Naglekerke (1991) R-square 
+
+$$
+\bar R^2 = \frac{R^2}{R^2_{max}}
+$$
+
+```{r}
+Num<- 1-exp((fit.gamma$dev-fit.gamma$null)/nrow(Chperfom))
+Den<- 1-exp(-fit.gamma$null/nrow(Chperfom))
+R2_Nag<- Num/Den; R2_Nag
+```
+
+3. An alternative R^2 
+
+```{r}
+Null.dev<- fit.gamma$null.deviance
+Resi.dev<- deviance(fit.gamma)
+##
+R2.dev<- (Null.dev-Resi.dev)/Null.dev; R2.dev
+```
+#### Analise do Desvio (Deviance)
+
+```{r}
+
+anova(fit.gamma, test="Chisq")
+
+## Estimate of disperssion parameter phi
+df<- df.residual(fit.gamma) ## residual degree of freedom
+dv<- deviance(fit.gamma)    ## residual deviance
+phi.est<- dv/df; phi.est
+
+## Goodness-of-fit analysis
+pchisq(deviance(fit.gamma), df.residual(fit.gamma), lower=FALSE)
+
+eta.gamma<- as.matrix(predict(fit.gamma, type="link"))
+```
+
+
+```{r}
+##------------------------------------##
+## RESIDUAL ANALYSIS: Usual Residuals ##
+##------------------------------------##
+res.gama_ordinar<- resid(fit.gamma, type="response")
+res.gama_working<- resid(fit.gamma, type="working")
+res.gama_pearson<- resid(fit.gamma, type="pearson")
+res.gama_devianc<- resid(fit.gamma, type="deviance")
+
+
+par(mfrow=c(2,2))
+plot(eta.gamma,res.gama_ordinar, xlab = "Eta.hat", ylab ="Resíduos", main="Resíduos Ordinários")
+plot(eta.gamma,res.gama_working, xlab = "Eta.hat", ylab ="Resíduos", main="Resíduos Workings")
+plot(eta.gamma,res.gama_pearson, xlab = "Eta.hat", ylab ="Resíduos", main="Resíduos de Pearson")
+plot(eta.gamma,res.gama_devianc, xlab = "Eta.hat", ylab ="Resíduos", main="Resíduos Desvio")
+
+##------------------------------------------##
+## RESIDUAL ANALYSIS: Studentized Residuals ##
+##------------------------------------------##
+## For Pearson Residuals
+
+par(mfrow=c(2,2))
+plot(fit.gamma)
+
+
+## For deviance residuals
+st.res.dev<- rstudent(fit.gamma, type="deviance")
+
+st.res.per<- rstudent(fit.gamma, type="pearson")
+```
+
+#### Pontos de influencia 
+
+```{r}
+betas<-as.vector(coef(fit.gamma))
+X.mat<- model.matrix(fit.gamma)
+eta.hat<- as.matrix(predict(fit.gamma, type="link"))
+
+##eta.gamma<- X.mat%*%betas
+
+## Hat values
+hatvalues(fit.gamma)
+
+## Cook Distance
+cooks.distance(fit.gamma)
+
+## Aggregated Measures
+influence.measures(fit.gamma)
+
+## Some residual graphs
+par(mfrow=c(2,2))
+plot(cooks.distance(fit.gamma), lwd = 2, col = "blue", type="h", ylab = "Distância de Cook")
+plot(hatvalues(fit.gamma), type = "h", lwd = 2, col = "blue", ylab= "hii")
+plot(hatvalues(fit.gamma), eta.hat, lwd = 2, col = "blue", xlab = "Eta.hat", ylab= "hii")
+
+```
+
